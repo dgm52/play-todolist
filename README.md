@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # play-todolist
 =============
 
@@ -25,3 +26,9 @@ https://www.atlassian.com/git/tutorials/
 Una vez hecho un commit y queremos deshacerlo: git reset --hard HEAD^
 
 No confundir con git checkout. Checkout es ir atras en el tiempo (Edit) es ir entre ramas.
+=======
+play-todolist
+=============
+
+Práctica de la asignatura MADS - Grado en Ingeniería Informática Universidad de Alicante
+>>>>>>> b189df62e3642d486eda4eda1560bf396305f41b
