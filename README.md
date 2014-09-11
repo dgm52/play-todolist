@@ -18,16 +18,16 @@ Siempre tenemos que usar
 - git commit -m "[Mensaje]"
 
 Mirar los tutoriales de Atlassian
-https://www.atlassian.com/es/git/tutorial/git-basics
-https://www.atlassian.com/git/tutorials/
+- https://www.atlassian.com/es/git/tutorial/git-basics
+- https://www.atlassian.com/git/tutorials/
 
 ### Descartar un commit
 Una vez hecho un commit y queremos deshacerlo: git reset --hard HEAD^
 
-No confundir con git checkout. Checkout es ir atras en el tiempo (Edit) es ir entre ramas.
-=======
-play-todolist
-=============
+### No confundir con git checkout. 
+Checkout es ir atras en el tiempo (Edit) es ir entre ramas.
+
+
 
 Práctica de la asignatura MADS - Grado en Ingeniería Informática Universidad de Alicante
 >>>>>>> b189df62e3642d486eda4eda1560bf396305f41b
