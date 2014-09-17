@@ -4,6 +4,9 @@
 
 * * *
 
+## Heroku
+<http://hidden-retreat-1168.herokuapp.com>
+
 ## Apuntes de clase
 
 En el tutorial utilizan `play` para los comandos. Nosotros usaremos `activator`:
