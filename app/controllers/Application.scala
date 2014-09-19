@@ -35,10 +35,10 @@ object Application extends Controller {
       //Ok(views.html.index(Task.all(), taskForm))
    }
 
-   /*def getTask(id: Long) = Action {
+   def getTask(id: Long) = Action {
       val json = Json.toJson(Task.getTask(id))
       Ok(json)
-   }*/
+   }
 
    def newTask = Action { implicit request =>
       taskForm.bindFromRequest.fold(
