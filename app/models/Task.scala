@@ -27,12 +27,11 @@ object Task {
       ).as(task.single)
    }
 
-   def create(label: String) {
-      DB.withConnection { implicit c =>
-         SQL("insert into task (label) values ({label})").on(
-            'label -> label
-            ).executeUpdate()
-      }
+   def create(label: String): String = DB.withConnection { implicit c =>
+      SQL("insert into task (label) values ({label})").on(
+         'label -> label
+      ).executeUpdate()
+      return label
    }
 
    def delete(id: Long) {

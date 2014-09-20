@@ -18,10 +18,12 @@ object Application extends Controller {
    )
 
    /* For JSON */
+
    implicit val taskWrites: Writes[Task] = (
       (JsPath \ "id").write[Long] and
       (JsPath \ "label").write[String]
    )(unlift(Task.unapply))
+
    /* /For JSON */
 
    def index = Action {
@@ -32,7 +34,6 @@ object Application extends Controller {
    def tasks = Action {
       val json = Json.toJson(Task.all())
       Ok(json)
-      //Ok(views.html.index(Task.all(), taskForm))
    }
 
    def getTask(id: Long) = Action {
@@ -44,8 +45,10 @@ object Application extends Controller {
       taskForm.bindFromRequest.fold(
          errors => BadRequest(views.html.index(Task.all(), errors)),
          label => {
-            Task.create(label)
-            Redirect(routes.Application.index)
+            val json = Json.obj(
+               "label" -> Json.toJson(Task.create(label))
+            )
+            Created(json)
          }
       )
    }
