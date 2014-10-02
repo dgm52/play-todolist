@@ -14,14 +14,16 @@ import models.Task
 object Application extends Controller {
 
    val taskForm = Form(
-      "label" -> nonEmptyText
+         "label" -> nonEmptyText//,
+         //"usertask" -> nonEmptyTex
    )
 
    /* For JSON */
 
    implicit val taskWrites: Writes[Task] = (
       (JsPath \ "id").write[Long] and
-      (JsPath \ "label").write[String]
+      (JsPath \ "label").write[String] and
+      (JsPath \ "usertask").write[String]
    )(unlift(Task.unapply))
 
    /* /For JSON */
