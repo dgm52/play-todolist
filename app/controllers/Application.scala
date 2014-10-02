@@ -65,8 +65,15 @@ object Application extends Controller {
    /* Feature 2 */
 
    def tasksUser(login: String) = Action {
-      val json = Json.toJson(Task.allUser(login))
-      Ok(json)
+      Task.getUser(login) match {  
+          case Some(i) => {
+            val json = Json.toJson(Task.allUser(i))
+            Ok(json)
+          }  
+          case None => NotFound  
+      }
+
+      
    }
 
 }
