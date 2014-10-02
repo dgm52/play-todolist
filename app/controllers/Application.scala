@@ -62,4 +62,11 @@ object Application extends Controller {
          NotFound
    }
 
+   /* Feature 2 */
+
+   def tasksUser(login: String) = Action {
+      val json = Json.toJson(Task.allUser(login))
+      Ok(json)
+   }
+
 }

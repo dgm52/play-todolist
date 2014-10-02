@@ -42,4 +42,12 @@ object Task {
             ).executeUpdate()
       }
    }
+
+   /* Feature2 */
+
+   def allUser(login: String): List[Task] = DB.withConnection { implicit c =>
+      SQL("select * from task where usertask_fk = {login}").on(
+         'login -> login
+      ).as(task *)
+   }
 }
