@@ -71,9 +71,19 @@ object Application extends Controller {
             Ok(json)
           }  
           case None => NotFound  
-      }
+      }      
+   }
 
-      
+   def newTaskUser(label: String, login: String) = Action {
+      Task.getUser(login) match {
+         case Some(i) => {
+            val json = Json.obj(
+               "label" -> Json.toJson(Task.createUserTask(label, i))
+            )
+            Created(json)
+          }  
+          case None => NotFound
+      }
    }
 
 }
