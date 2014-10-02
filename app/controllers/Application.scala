@@ -14,14 +14,16 @@ import models.Task
 object Application extends Controller {
 
    val taskForm = Form(
-      "label" -> nonEmptyText
+         "label" -> nonEmptyText//,
+         //"usertask" -> nonEmptyTex
    )
 
    /* For JSON */
 
    implicit val taskWrites: Writes[Task] = (
       (JsPath \ "id").write[Long] and
-      (JsPath \ "label").write[String]
+      (JsPath \ "label").write[String] and
+      (JsPath \ "usertask").write[String]
    )(unlift(Task.unapply))
 
    /* /For JSON */
@@ -58,6 +60,30 @@ object Application extends Controller {
          Redirect(routes.Application.index)
       else
          NotFound
+   }
+
+   /* Feature 2 */
+
+   def tasksUser(login: String) = Action {
+      Task.getUser(login) match {  
+          case Some(i) => {
+            val json = Json.toJson(Task.allUser(i))
+            Ok(json)
+          }  
+          case None => NotFound  
+      }      
+   }
+
+   def newTaskUser(label: String, login: String) = Action {
+      Task.getUser(login) match {
+         case Some(i) => {
+            val json = Json.obj(
+               "label" -> Json.toJson(Task.createUserTask(label, i))
+            )
+            Created(json)
+          }  
+          case None => NotFound
+      }
    }
 
 }
