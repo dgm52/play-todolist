@@ -6,7 +6,7 @@ import anorm.SqlParser._
 import play.api.db._
 import play.api.Play.current
 
-import java.util.Date
+import java.util.{Date}
 
 case class Task(id: Long, label: String, usertask: String, enddate: Option[Date])
 
@@ -78,6 +78,13 @@ object Task {
       SQL("select * from task where usertask_fk = {usuario} and enddate = {enddate}").on(
          'usuario -> login,
          'enddate -> enddate
+      ).as(task *)
+   }
+
+   def allBeforeDate(dateBefore: Option[Date]): List[Task] = DB.withConnection { implicit c =>
+
+      SQL("select * from task where enddate < {dateBefore}").on(
+         'dateBefore -> dateBefore
       ).as(task *)
    }
 

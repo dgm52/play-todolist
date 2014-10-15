@@ -9,7 +9,7 @@ import play.api.data.Forms._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-import java.util.Date
+import java.util.{Date}
 
 import models.Task
 
@@ -97,25 +97,8 @@ object Application extends Controller {
       Some(param)
    }
 
-   //def tasksUserDate(login: String, enddate: Option[java.util.Date]) = Action {
-   def tasksUserDate(login: String, enddate: String) = Action {
-      var formatter = new java.text.SimpleDateFormat("yyyy-MM-dd")
-      var date = formatter.parse(enddate)
-
-      var dateParam = dateToOptionDate(date)
-
-      Task.getUser(login) match {  
-          case Some(i) => {
-            val json = Json.toJson(Task.allUserDate(i, dateParam))
-            Ok(json)
-          }  
-          case None => NotFound  
-      }      
-   }
-
-   //def newtaskUserDate(label: String, login: String, enddate: Option[java.util.Date]) = Action {
    def newtaskUserDate(label: String, login: String, enddate: String) = Action {
-      var formatter = new java.text.SimpleDateFormat("yyyy-MM-dd")
+      var formatter = new java.text.SimpleDateFormat("YYYY-MM-DD")
       var date = formatter.parse(enddate)
 
       var dateParam = dateToOptionDate(date)
@@ -129,6 +112,30 @@ object Application extends Controller {
           }  
           case None => NotFound
       }
+   }
+
+   def tasksUserDate(login: String, enddate: String) = Action {
+      var formatter = new java.text.SimpleDateFormat("YYYY-MM-DD")
+      var date = formatter.parse(enddate)
+
+      var dateParam = dateToOptionDate(date)
+
+      Task.getUser(login) match {  
+          case Some(i) => {
+            val json = Json.toJson(Task.allUserDate(i, dateParam))
+            Ok(json)
+          }  
+          case None => NotFound  
+      }      
+   }
+
+   def tasksUserBeforeDate(beforedate: String) = Action {
+      var formatter = new java.text.SimpleDateFormat("YYYY-MM-DD")
+      var date = formatter.parse(beforedate)
+      var dateParam = dateToOptionDate(date)
+
+      val json = Json.toJson(Task.allBeforeDate(dateParam))
+      Ok(json)   
    }
 
    /* !-- Feature 3 */
