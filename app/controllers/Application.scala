@@ -10,10 +10,15 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
 import java.util.{Date}
+import java.util.Date
+import java.text.SimpleDateFormat
 
 import models.Task
 
 object Application extends Controller {
+
+   val dateWrite = Writes.dateWrites("yyyy-MM-dd")
+   val formatter = new SimpleDateFormat("yyyy-MM-dd")
 
    val taskForm = Form(
          "label" -> nonEmptyText//,
@@ -26,7 +31,7 @@ object Application extends Controller {
       (JsPath \ "id").write[Long] and
       (JsPath \ "label").write[String] and
       (JsPath \ "usertask").write[String] and
-      (JsPath \ "enddate").write[Option[Date]]
+      (JsPath \ "enddate").writeNullable[Date](dateWrite)
    )(unlift(Task.unapply))
 
    /* /For JSON */
