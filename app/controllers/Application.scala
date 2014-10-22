@@ -103,7 +103,6 @@ object Application extends Controller {
    }
 
    def newtaskUserDate(label: String, login: String, enddate: String) = Action {
-      var formatter = new java.text.SimpleDateFormat("YYYY-MM-DD")
       var date = formatter.parse(enddate)
 
       var dateParam = dateToOptionDate(date)
