@@ -39,12 +39,17 @@ object Task {
       return label
    }
 
-   def delete(id: Long): Int = {
-      DB.withConnection { implicit c =>
-         SQL("delete from task where id = {id}").on(
-            'id -> id
-            ).executeUpdate()
-      }
+   def delete(id: Long): Boolean = {
+     DB.withConnection { implicit c =>
+       val result: Int = SQL("delete from task where id = {id}").on(
+         'id -> id
+       ).executeUpdate()
+       
+       result match {
+         case 1 => true
+         case _ => false
+       }
+     }
    }
 
    /* Feature2 */
