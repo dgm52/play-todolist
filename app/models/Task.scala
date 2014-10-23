@@ -32,19 +32,19 @@ object Task {
       ).as(task.single)
    }
 
-   def create(label: String): String = DB.withConnection { implicit c =>
-      SQL("insert into task (usertask_fk, label) values ('Anonimo', {label})").on(
-         'label -> label
-      ).executeUpdate()
-      return label
-   }
+   def create(label: String): Task = createUserTask(label, "Anonimo")
 
-   def delete(id: Long): Int = {
-      DB.withConnection { implicit c =>
-         SQL("delete from task where id = {id}").on(
-            'id -> id
-            ).executeUpdate()
-      }
+   def delete(id: Long): Boolean = {
+     DB.withConnection { implicit c =>
+       val result: Int = SQL("delete from task where id = {id}").on(
+         'id -> id
+       ).executeUpdate()
+       
+       result match {
+         case 1 => true
+         case _ => false
+       }
+     }
    }
 
    /* Feature2 */
@@ -62,12 +62,19 @@ object Task {
       ).as(task *)
    }
 
-   def createUserTask(label: String, login: String): String = DB.withConnection { implicit c =>      
-      SQL("insert into task (usertask_fk, label) values ({login}, {label})").on(
+   def createUserTask(label: String, login: String): Task = DB.withConnection { implicit c =>      
+      
+      val id: Option[Long] = SQL("insert into task (usertask_fk, label) values ({login}, {label})").on(
          'login -> login,
          'label -> label
-      ).executeUpdate()
-      return label
+      ).executeInsert()
+
+      val b: Long = id match {  
+          case Some(id) => id
+          case None => 0  
+      }      
+
+      return getTask(b)
    }
 
    /* !-- Feature 2 */

@@ -55,16 +55,14 @@ object Application extends Controller {
       taskForm.bindFromRequest.fold(
          errors => BadRequest(views.html.index(Task.all(), errors)),
          label => {
-            val json = Json.obj(
-               "label" -> Json.toJson(Task.create(label))
-            )
+            val json = Json.toJson(Task.create(label))
             Created(json)
          }
       )
    }
 
    def deleteTask(id: Long) = Action {
-      if(Task.delete(id) > 0)
+      if(Task.delete(id))
          Redirect(routes.Application.index)
       else
          NotFound
@@ -85,12 +83,10 @@ object Application extends Controller {
    def newTaskUser(label: String, login: String) = Action {
       Task.getUser(login) match {
          case Some(i) => {
-            val json = Json.obj(
-               "label" -> Json.toJson(Task.createUserTask(label, i))
-            )
+            val json = Json.toJson(Task.createUserTask(label, i))
             Created(json)
           }  
-          case None => NotFound
+          case None => BadRequest("Error: No existe el propietario de la tarea: " + login)
       }
    }
 
