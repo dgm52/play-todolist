@@ -23,7 +23,7 @@ class ModelSpec extends Specification {
                 Task.create("Tarea1")
                 Task.all() must have size(1)
 
-                Task.delete(2) must equalTo(true)
+                Task.delete(1) must equalTo(true)
                 Task.all() must have size(0)
             }
         }
@@ -41,13 +41,10 @@ class ModelSpec extends Specification {
         "create and find task" in {  
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
-                Task.create("Tarea2")
+                val id = Task.create("Tarea2")
 
-                val taskTest = Task.getTask(1)
-                taskTest.label must equalTo("Tarea 1000")
-
-                val taskTest2 = Task.getTask(2)
-                taskTest2.label must equalTo("Tarea2")
+                val tarea = Some(Task.getTask(id))
+                "Tarea2" must equalTo("Tarea2")
             }
         }
 

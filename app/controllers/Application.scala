@@ -62,10 +62,13 @@ object Application extends Controller {
    }
 
    def deleteTask(id: Long) = Action {
-      if(Task.delete(id))
-         Redirect(routes.Application.index)
-      else
-         NotFound
+      Task.getTask(id) match {  
+         case Some(i) => {
+            val json = Json.toJson(Task.delete(id))
+            Ok(json)
+         }  
+         case None => NotFound
+      }
    }
 
    /* Feature 2 */

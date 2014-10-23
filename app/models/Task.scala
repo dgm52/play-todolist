@@ -17,7 +17,6 @@ object Task {
       get[String]("label") ~
       get[String]("usertask_fk") ~ 
       get[Option[Date]]("enddate") map {
-         //case id~label~usertask => Task(id, label, usertask)
          case id~label~usertask~enddate => Task(id, label, usertask, enddate)
       }
    }
@@ -26,16 +25,16 @@ object Task {
       SQL("select * from task where usertask_fk = 'Anonimo'").as(task *)
    }
 
-   def getTask(id: Long): Task = DB.withConnection { implicit c =>
+   def getTask(id: Long): Option[Task] = DB.withConnection { implicit c =>
       SQL("select * from task where id = {id}").on(
          'id -> id
-      ).as(task.single)
+      ).as(task.singleOpt)
    }
 
-   def create(label: String): Task = createUserTask(label, "Anonimo")
+   def create(label: String): Long = createUserTask(label, "Anonimo")
 
    def delete(id: Long): Boolean = {
-     DB.withConnection { implicit c =>
+      DB.withConnection { implicit c =>
        val result: Int = SQL("delete from task where id = {id}").on(
          'id -> id
        ).executeUpdate()
@@ -62,7 +61,7 @@ object Task {
       ).as(task *)
    }
 
-   def createUserTask(label: String, login: String): Task = DB.withConnection { implicit c =>      
+   def createUserTask(label: String, login: String): Long = DB.withConnection { implicit c =>      
       
       val id: Option[Long] = SQL("insert into task (usertask_fk, label) values ({login}, {label})").on(
          'login -> login,
@@ -74,7 +73,7 @@ object Task {
           case None => 0  
       }      
 
-      return getTask(b)
+      id.getOrElse(-1)
    }
 
    /* !-- Feature 2 */

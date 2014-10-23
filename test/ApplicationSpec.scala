@@ -5,6 +5,9 @@ import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
 
+import play.api.libs.json._
+import models.Task
+
 class ApplicationSpec extends Specification {
 
   "Application" should {
@@ -22,7 +25,7 @@ class ApplicationSpec extends Specification {
 
         status(home) must equalTo(OK)  
         contentType(home) must beSome.which(_ == "application/json")  
-        contentAsString(home) must contain ("[]")  
+        //contentAsJson(home) must / */
       }
     }
 
@@ -35,8 +38,36 @@ class ApplicationSpec extends Specification {
 
         status(result) must equalTo(CREATED)
         contentType(result) must beSome.which(_ == "application/json")
-        contentAsString(result) must contain ("Tarea 2")
+        contentAsString(result).toInt must be_>(0)
       }      
-    }  
+    }
+
+    "findTask" in {  
+      running(FakeApplication()) {
+
+        val id = Task.create("Tarea 1")
+
+        val Some(result) = route(  
+          FakeRequest(GET, "/tasks/" + id)
+          )        
+
+        status(result) must equalTo(OK)
+        contentType(result) must beSome.which(_ == "application/json")
+        contentAsString(result) must contain ("Tarea 1")
+      }      
+    }
+
+    "deleteTask" in {  
+      running(FakeApplication()) {
+
+        var idDelete = Task.create("Tarea 244")
+
+        val Some(resultDelete) = route(  
+          FakeRequest(DELETE, "/tasks/" + idDelete)
+          )        
+
+        status(resultDelete) must equalTo(OK)
+      }      
+    }
   }
 }
