@@ -63,17 +63,7 @@ object Task {
 
    def createUserTask(label: String, login: String): Long = DB.withConnection { implicit c =>      
       
-      val id: Option[Long] = SQL("insert into task (usertask_fk, label) values ({login}, {label})").on(
-         'login -> login,
-         'label -> label
-      ).executeInsert()
-
-      val b: Long = id match {  
-          case Some(id) => id
-          case None => 0  
-      }      
-
-      id.getOrElse(-1)
+      createUserTaskDate(label, login, None)
    }
 
    /* !-- Feature 2 */
@@ -94,15 +84,21 @@ object Task {
       ).as(task *)
    }
 
-   def createUserTaskDate(label: String, login: String, enddate: Option[Date]): String = DB.withConnection { implicit c =>
+   def createUserTaskDate(label: String, login: String, enddate: Option[Date]): Long = DB.withConnection { implicit c =>
       var date = Some(enddate)
 
-      SQL("insert into task (usertask_fk, label, enddate) values ({login}, {label}, {enddate})").on(
+      val id: Option[Long] = SQL("insert into task (usertask_fk, label, enddate) values ({login}, {label}, {enddate})").on(
          'login -> login,
          'label -> label,
          'enddate -> date
-      ).executeUpdate()
-      return label
+      ).executeInsert()
+
+      val b: Long = id match {  
+          case Some(id) => id
+          case None => 0  
+      }      
+
+      id.getOrElse(-1)
    }
 
    /* !-- Feature 3 */

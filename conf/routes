@@ -18,7 +18,7 @@ POST    /:login/tasks                  controllers.Application.newTaskUser(login
 #TaskDates
 GET     /:dateBefore/before/tasks      controllers.Application.tasksUserBeforeDate(dateBefore: String)
 GET     /:login/:enddate/tasks         controllers.Application.tasksUserDate(login: String, enddate: String)
-POST    /:login/:enddate/tasks         controllers.Application.newtaskUserDate(label: String, login: String, enddate: String)
+POST    /:login/:enddate/tasks         controllers.Application.newtaskUserDate(login: String, enddate: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                  controllers.Assets.at(path="/public", file)

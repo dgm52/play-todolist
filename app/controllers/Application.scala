@@ -79,47 +79,37 @@ object Application extends Controller {
       }      
    }
 
-   def newTaskUser(login: String) = Action { implicit request =>
-     taskForm.bindFromRequest.fold(
-       errors => BadRequest("Error en la peticion: form"),
-       taskData => Task.getUser(login) match {
-                     case Some(i) => {
-                        val id: Long = Task.createUserTask(taskData.label, taskData.login)
-                        val task = Task.getTask(id)
-                        Created(Json.toJson(task))
-                     }
-                     case None => BadRequest("Error: No existe el propietario de la tarea: " + taskData.login)
-     })
-   }
-
+   def newTaskUser(login: String) = newtaskUserDate(login, "")
    /* !-- Feature 2 */
 
-   /* Feature 3 */
 
+   /* Feature 3 */
    def dateToOptionDate(param: Date): Option[Date] = {
       Some(param)
    }
 
-   def newtaskUserDate(label: String, login: String, enddate: String) = Action {
-      var date = formatter.parse(enddate)
+   def newtaskUserDate(login: String, enddate: String) = Action { implicit request =>
+      var dateParam: Option[Date] = None
 
-      var dateParam = dateToOptionDate(date)
-
-      Task.getUser(login) match {
-         case Some(i) => {
-            val json = Json.obj(
-               "label" -> Json.toJson(Task.createUserTaskDate(label, i, dateParam))
-            )
-            Created(json)
-          }  
-          case None => NotFound
+      if(!enddate.isEmpty()){
+         var date = formatter.parse(enddate)
+         dateParam = dateToOptionDate(date)
       }
+
+      taskForm.bindFromRequest.fold(
+       errors => BadRequest("Error en la peticion: form"),
+       taskData => Task.getUser(login) match {
+                     case Some(i) => {
+                        val id: Long = Task.createUserTaskDate(taskData.label, login, dateParam)
+                        val task = Task.getTask(id)
+                        Created(Json.toJson(task))
+                     }
+                     case None => BadRequest("Error: No existe el propietario de la tarea: " + taskData.login)
+     })   
    }
 
    def tasksUserDate(login: String, enddate: String) = Action {
-      var formatter = new java.text.SimpleDateFormat("YYYY-MM-DD")
       var date = formatter.parse(enddate)
-
       var dateParam = dateToOptionDate(date)
 
       Task.getUser(login) match {  
@@ -128,11 +118,10 @@ object Application extends Controller {
             Ok(json)
           }  
           case None => NotFound  
-      }      
+      }  
    }
 
    def tasksUserBeforeDate(beforedate: String) = Action {
-      var formatter = new java.text.SimpleDateFormat("YYYY-MM-DD")
       var date = formatter.parse(beforedate)
       var dateParam = dateToOptionDate(date)
 
