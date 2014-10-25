@@ -48,5 +48,28 @@ class ModelSpec extends Specification {
             }
         }
 
+        "find user" in {  
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+                val Some(usuario) = Task.getUser("Dani")
+                usuario must equalTo("Dani")
+            }
+        }
+
+        "find incorrect user" in {  
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+                val usuario = Task.getUser("a")
+                usuario must be (None)
+            }
+        }
+
+        "all task for one user" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                Task.createUserTask("Tarea1", "Dani")
+                Task.allUser("Dani") must have size(1)
+            }
+        }
+
     }  
 }
