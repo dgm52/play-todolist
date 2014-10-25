@@ -7,10 +7,14 @@ import play.api.test.Helpers._
 
 import models.Task
 
+import java.util.Date
+import java.text.SimpleDateFormat
+
 class ModelSpec extends Specification {
 
     def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str  
     def strToDate(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
+    val formatter = new SimpleDateFormat("yyyy-MM-dd")
 
     "Models" should {
 
@@ -48,6 +52,7 @@ class ModelSpec extends Specification {
             }
         }
 
+        // Feature 2
         "find user" in {  
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
@@ -68,6 +73,37 @@ class ModelSpec extends Specification {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
                 Task.createUserTask("Tarea1", "Dani")
                 Task.allUser("Dani") must have size(1)
+            }
+        }
+
+        //Feature 3
+        "createUserTaskDate" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                var date = formatter.parse("2015-01-02")
+                var dateParam = Some(date)
+
+                Task.createUserTaskDate("Tarea1", "Dani", dateParam)
+                Task.allUser("Dani") must have size(1)
+            }
+        }
+
+        "allUserTaskDate: 1" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                var date = formatter.parse("2015-01-02")
+                var dateParam = Some(date)
+
+                Task.createUserTaskDate("Tarea1", "Dani", dateParam)
+                Task.allUserDate("Dani", dateParam) must have size(1)
+            }
+        }
+
+        "allBeforeDate en una fecha concreta: 0" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                var date = formatter.parse("2015-01-02")
+                var dateParam = Some(date)
+
+                Task.createUserTaskDate("Tarea1", "Dani", dateParam)
+                Task.allBeforeDate(dateParam) must have size(0)
             }
         }
 

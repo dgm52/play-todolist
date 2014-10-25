@@ -15,14 +15,19 @@ import java.text.SimpleDateFormat
 
 import models.Task
 
+case class TaskData(label: String, login: String, enddate: Option[Date])
+
 object Application extends Controller {
 
    val dateWrite = Writes.dateWrites("yyyy-MM-dd")
    val formatter = new SimpleDateFormat("yyyy-MM-dd")
 
    val taskForm = Form(
-         "label" -> nonEmptyText//,
-         //"usertask" -> nonEmptyTex
+      mapping( 
+         "label" -> nonEmptyText,
+         "login" -> nonEmptyText,
+         "enddate" -> optional(date("yyyy-MM-dd"))
+      )(TaskData.apply)(TaskData.unapply)
    )
 
    /* For JSON */
@@ -38,7 +43,6 @@ object Application extends Controller {
 
    def index = Action {
       Ok(views.html.index(Task.all(), taskForm))
-      //Redirect(routes.Application.tasks)
    }
 
    def tasks = Action {
@@ -51,15 +55,7 @@ object Application extends Controller {
       Ok(json)
    }
 
-   def newTask = Action { implicit request =>
-      taskForm.bindFromRequest.fold(
-         errors => BadRequest(views.html.index(Task.all(), errors)),
-         label => {
-            val json = Json.toJson(Task.create(label))
-            Created(json)
-         }
-      )
-   }
+   def newTask = newTaskUser("Anonimo")
 
    def deleteTask(id: Long) = Action {
       Task.getTask(id) match {  
@@ -83,44 +79,37 @@ object Application extends Controller {
       }      
    }
 
-   def newTaskUser(label: String, login: String) = Action {
-      Task.getUser(login) match {
-         case Some(i) => {
-            val json = Json.toJson(Task.createUserTask(label, i))
-            Created(json)
-          }  
-          case None => BadRequest("Error: No existe el propietario de la tarea: " + login)
-      }
-   }
-
+   def newTaskUser(login: String) = newtaskUserDate(login, "")
    /* !-- Feature 2 */
 
-   /* Feature 3 */
 
+   /* Feature 3 */
    def dateToOptionDate(param: Date): Option[Date] = {
       Some(param)
    }
 
-   def newtaskUserDate(label: String, login: String, enddate: String) = Action {
-      var date = formatter.parse(enddate)
+   def newtaskUserDate(login: String, enddate: String) = Action { implicit request =>
+      var dateParam: Option[Date] = None
 
-      var dateParam = dateToOptionDate(date)
-
-      Task.getUser(login) match {
-         case Some(i) => {
-            val json = Json.obj(
-               "label" -> Json.toJson(Task.createUserTaskDate(label, i, dateParam))
-            )
-            Created(json)
-          }  
-          case None => NotFound
+      if(!enddate.isEmpty()){
+         var date = formatter.parse(enddate)
+         dateParam = dateToOptionDate(date)
       }
+
+      taskForm.bindFromRequest.fold(
+       errors => BadRequest("Error en la peticion: form"),
+       taskData => Task.getUser(login) match {
+                     case Some(i) => {
+                        val id: Long = Task.createUserTaskDate(taskData.label, login, dateParam)
+                        val task = Task.getTask(id)
+                        Created(Json.toJson(task))
+                     }
+                     case None => BadRequest("Error: No existe el propietario de la tarea: " + taskData.login)
+     })   
    }
 
    def tasksUserDate(login: String, enddate: String) = Action {
-      var formatter = new java.text.SimpleDateFormat("YYYY-MM-DD")
       var date = formatter.parse(enddate)
-
       var dateParam = dateToOptionDate(date)
 
       Task.getUser(login) match {  
@@ -129,11 +118,10 @@ object Application extends Controller {
             Ok(json)
           }  
           case None => NotFound  
-      }      
+      }  
    }
 
    def tasksUserBeforeDate(beforedate: String) = Action {
-      var formatter = new java.text.SimpleDateFormat("YYYY-MM-DD")
       var date = formatter.parse(beforedate)
       var dateParam = dateToOptionDate(date)
 
