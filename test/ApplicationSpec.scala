@@ -18,7 +18,7 @@ class ApplicationSpec extends Specification {
       }
     }
 
-    "render the clean tasks page" in {  
+    "render the empty tasks page" in {  
       running(FakeApplication()) {
 
         val Some(home) = route(FakeRequest(GET, "/tasks"))
@@ -33,12 +33,12 @@ class ApplicationSpec extends Specification {
       running(FakeApplication()) {
 
         val Some(result) = route(  
-          FakeRequest(POST, "/tasks").withFormUrlEncodedBody(("label","Tarea 2"))
+          FakeRequest(POST, "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login","Anonimo"))
           )
 
         status(result) must equalTo(CREATED)
         contentType(result) must beSome.which(_ == "application/json")
-        contentAsString(result).toInt must be_>(0)
+        contentAsString(result) must contain ("Tarea 2")
       }      
     }
 
@@ -67,6 +67,35 @@ class ApplicationSpec extends Specification {
           )        
 
         status(resultDelete) must equalTo(OK)
+      }      
+    }
+
+    // Feature 2
+
+    "tasksUser" in {  
+      running(FakeApplication()) {
+
+        val usuario = "Dani"
+        var id = Task.createUserTask("Tarea1", usuario)
+
+        val Some(resultTasksUser) = route(FakeRequest(GET, "/" + usuario + "/tasks"))        
+
+        status(resultTasksUser) must equalTo(OK)
+        contentType(resultTasksUser) must beSome.which(_ == "application/json")
+      }      
+    }
+
+    "new userTask" in {  
+      running(FakeApplication()) {
+
+        val usuario = "Dani"
+        //var id = Task.createUserTask("Tarea1", usuario)
+
+        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario)))
+
+        status(resultTasksUser) must equalTo(CREATED)
+        contentType(resultTasksUser) must beSome.which(_ == "application/json")
+        contentAsString(resultTasksUser) must contain ("Tarea 2")
       }      
     }
   }

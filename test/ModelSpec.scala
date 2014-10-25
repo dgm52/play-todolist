@@ -48,6 +48,8 @@ class ModelSpec extends Specification {
             }
         }
 
+        // Feature 2
+
         "find user" in {  
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 

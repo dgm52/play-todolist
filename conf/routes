@@ -13,7 +13,7 @@ DELETE  /tasks/:id                     controllers.Application.deleteTask(id: Lo
 
 #UserTasks
 GET     /:login/tasks                  controllers.Application.tasksUser(login: String)
-POST    /:login/tasks                  controllers.Application.newTaskUser(label: String, login: String)
+POST    /:login/tasks                  controllers.Application.newTaskUser(login: String)
 
 #TaskDates
 GET     /:dateBefore/before/tasks      controllers.Application.tasksUserBeforeDate(dateBefore: String)

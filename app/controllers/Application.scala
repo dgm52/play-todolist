@@ -15,14 +15,19 @@ import java.text.SimpleDateFormat
 
 import models.Task
 
+case class TaskData(label: String, login: String, enddate: Option[Date])
+
 object Application extends Controller {
 
    val dateWrite = Writes.dateWrites("yyyy-MM-dd")
    val formatter = new SimpleDateFormat("yyyy-MM-dd")
 
    val taskForm = Form(
-         "label" -> nonEmptyText//,
-         //"usertask" -> nonEmptyTex
+      mapping( 
+         "label" -> nonEmptyText,
+         "login" -> nonEmptyText,
+         "enddate" -> optional(date("yyyy-MM-dd"))
+      )(TaskData.apply)(TaskData.unapply)
    )
 
    /* For JSON */
@@ -38,7 +43,6 @@ object Application extends Controller {
 
    def index = Action {
       Ok(views.html.index(Task.all(), taskForm))
-      //Redirect(routes.Application.tasks)
    }
 
    def tasks = Action {
@@ -51,15 +55,7 @@ object Application extends Controller {
       Ok(json)
    }
 
-   def newTask = Action { implicit request =>
-      taskForm.bindFromRequest.fold(
-         errors => BadRequest(views.html.index(Task.all(), errors)),
-         label => {
-            val json = Json.toJson(Task.create(label))
-            Created(json)
-         }
-      )
-   }
+   def newTask = newTaskUser("Anonimo")
 
    def deleteTask(id: Long) = Action {
       Task.getTask(id) match {  
@@ -83,14 +79,17 @@ object Application extends Controller {
       }      
    }
 
-   def newTaskUser(label: String, login: String) = Action {
-      Task.getUser(login) match {
-         case Some(i) => {
-            val json = Json.toJson(Task.createUserTask(label, i))
-            Created(json)
-          }  
-          case None => BadRequest("Error: No existe el propietario de la tarea: " + login)
-      }
+   def newTaskUser(login: String) = Action { implicit request =>
+     taskForm.bindFromRequest.fold(
+       errors => BadRequest("Error en la peticion: form"),
+       taskData => Task.getUser(login) match {
+                     case Some(i) => {
+                        val id: Long = Task.createUserTask(taskData.label, taskData.login)
+                        val task = Task.getTask(id)
+                        Created(Json.toJson(task))
+                     }
+                     case None => BadRequest("Error: No existe el propietario de la tarea: " + taskData.login)
+     })
    }
 
    /* !-- Feature 2 */
