@@ -1,11 +1,11 @@
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.junit.runner._
+import org.specs2.matcher._
 
 import play.api.test._
 import play.api.test.Helpers._
 
-import play.api.libs.json._
+import play.api.libs.json.{Json, JsValue}
 
 import java.util.Date
 import java.text.SimpleDateFormat
@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat
 import models.Task
 import controllers.Application
 
-class ApplicationSpec extends Specification {
+class ApplicationSpec extends Specification with JsonMatchers {
 
   "Application" should {
 
@@ -29,12 +29,11 @@ class ApplicationSpec extends Specification {
         val Some(home) = route(FakeRequest(GET, "/tasks"))
 
         status(home) must equalTo(OK)  
-        contentType(home) must beSome.which(_ == "application/json")  
-        //contentAsJson(home) must / */
+        contentType(home) must beSome.which(_ == "application/json")
       }
     }
 
-    "newTask" in {  
+    "send 201 on a newTask request" in {  
       running(FakeApplication()) {
 
         val Some(result) = route(  
@@ -43,7 +42,12 @@ class ApplicationSpec extends Specification {
 
         status(result) must equalTo(CREATED)
         contentType(result) must beSome.which(_ == "application/json")
-        contentAsString(result) must contain ("Tarea 2")
+
+        val resultJson: JsValue = contentAsJson(result)
+        val resultString = Json.stringify(resultJson) 
+
+        resultString must /("label" -> "Tarea 2")
+        resultString must /("usertask" -> "Anonimo")
       }      
     }
 
@@ -58,7 +62,13 @@ class ApplicationSpec extends Specification {
 
         status(result) must equalTo(OK)
         contentType(result) must beSome.which(_ == "application/json")
-        contentAsString(result) must contain ("Tarea 1")
+
+        val resultJson: JsValue = contentAsJson(result)
+        val resultString = Json.stringify(resultJson) 
+
+        resultString must /("id" -> id)
+        resultString must /("label" -> "Tarea 1")
+        resultString must /("usertask" -> "Anonimo")
       }      
     }
 
@@ -98,7 +108,12 @@ class ApplicationSpec extends Specification {
 
         status(resultTasksUser) must equalTo(CREATED)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
-        contentAsString(resultTasksUser) must contain ("Tarea 2")
+
+        val resultJson: JsValue = contentAsJson(resultTasksUser)
+        val resultString = Json.stringify(resultJson) 
+
+        resultString must /("label" -> "Tarea 2")
+        resultString must /("usertask" -> usuario)
       }      
     }
 
@@ -114,7 +129,13 @@ class ApplicationSpec extends Specification {
 
         status(resultTasksUser) must equalTo(CREATED)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
-        contentAsString(resultTasksUser) must contain ("Tarea 2")
+
+        val resultJson: JsValue = contentAsJson(resultTasksUser)
+        val resultString = Json.stringify(resultJson) 
+
+        resultString must /("label" -> "Tarea 2")
+        resultString must /("usertask" -> usuario)
+        resultString must /("enddate" -> fecha)
       }      
     }
 
@@ -133,7 +154,13 @@ class ApplicationSpec extends Specification {
 
         status(resultTasksUser) must equalTo(OK)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
-        contentAsString(resultTasksUser) must contain ("Tarea1")
+
+        /*val resultJson: JsValue = contentAsJson(resultTasksUser)
+        val resultString = Json.stringify(resultJson) 
+
+        resultString must /("label" -> "Tarea1")
+        resultString must /("usertask" -> usuario)
+        resultString must /("enddate" -> fecha)*/
       }      
     }
 

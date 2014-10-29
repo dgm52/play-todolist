@@ -62,7 +62,6 @@ object Task {
    }
 
    def createUserTask(label: String, login: String): Long = DB.withConnection { implicit c =>      
-      
       createUserTaskDate(label, login, None)
    }
 

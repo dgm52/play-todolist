@@ -10,7 +10,7 @@ import models.Task
 import java.util.Date
 import java.text.SimpleDateFormat
 
-class ModelSpec extends Specification {
+class ModelSpec extends Specification{
 
     def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str  
     def strToDate(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
@@ -18,8 +18,7 @@ class ModelSpec extends Specification {
 
     "Models" should {
 
-        // Tenemos en cuenta que el usuario insertado en la BD no es Anonimo pero estamos realizando pruebas con Anonimo unicamente
-        "create and delete task" in {
+        "create, check that we have one task and delete a task, checking that there aren't tasks now" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
                 
                 Task.all() must have size(0)
@@ -32,7 +31,7 @@ class ModelSpec extends Specification {
             }
         }
 
-        "all tasks (Anonimo)" in {
+        "create a task and check there is one task" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
                 // Creamos tarea (con el usuario Anonimo implicito)
@@ -47,8 +46,9 @@ class ModelSpec extends Specification {
 
                 val id = Task.create("Tarea2")
 
-                val tarea = Some(Task.getTask(id))
-                "Tarea2" must equalTo("Tarea2")
+                val Some(tarea) = Task.getTask(id)
+                //val Some(user) = User.findByUsername("pepito@gmail.com")  
+                tarea.label must equalTo("Tarea2")
             }
         }
 
@@ -69,7 +69,7 @@ class ModelSpec extends Specification {
             }
         }
 
-        "all task for one user" in {
+        "returns all task for one user" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
                 Task.createUserTask("Tarea1", "Dani")
                 Task.allUser("Dani") must have size(1)
@@ -87,7 +87,7 @@ class ModelSpec extends Specification {
             }
         }
 
-        "allUserTaskDate: 1" in {
+        "allUserTaskDate: must have 1 task" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
                 var date = formatter.parse("2015-01-02")
                 var dateParam = Some(date)
@@ -97,7 +97,7 @@ class ModelSpec extends Specification {
             }
         }
 
-        "allBeforeDate en una fecha concreta: 0" in {
+        "allBeforeDate en una fecha concreta: must have 0 task" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
                 var date = formatter.parse("2015-01-02")
                 var dateParam = Some(date)
