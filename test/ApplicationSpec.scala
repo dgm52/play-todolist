@@ -5,7 +5,7 @@ import org.specs2.matcher._
 import play.api.test._
 import play.api.test.Helpers._
 
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{Json, JsValue, JsArray}
 
 import java.util.Date
 import java.text.SimpleDateFormat
@@ -33,7 +33,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
       }
     }
 
-    "send 201 on a newTask request" in {  
+    "return CREATED on POST /tasks with EncodedBody" in {  
       running(FakeApplication()) {
 
         val Some(result) = route(  
@@ -51,7 +51,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
       }      
     }
 
-    "findTask" in {  
+    "return OK on GET /tasks/<id>" in {  
       running(FakeApplication()) {
 
         val id = Task.create("Tarea 1")
@@ -72,7 +72,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
       }      
     }
 
-    "deleteTask" in {  
+    "return OK on DELETE /tasks/<id>" in {  
       running(FakeApplication()) {
 
         var idDelete = Task.create("Tarea 244")
@@ -86,7 +86,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
     }
 
     // Feature 2
-    "tasksUser" in {  
+    "return OK on GET /<usuario>/tasks" in {  
       running(FakeApplication()) {
 
         val usuario = "Dani"
@@ -99,7 +99,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
       }      
     }
 
-    "new userTask" in {  
+    "return CREATED on POST /<usuario>/tasks with EncodedBody" in {  
       running(FakeApplication()) {
 
         val usuario = "Dani"
@@ -119,7 +119,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
 
     //Feature 3
 
-    "newtaskUserDate" in {  
+    "return CREATED on POST /<usuario>/<fecha>/tasks with EncodedBody" in {  
       running(FakeApplication()) {
 
         val usuario = "Dani"
@@ -139,7 +139,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
       }      
     }
 
-    "tasksUserDate" in {  
+    "return OK on GET /<usuario>/<fecha>/tasks" in {  
       running(FakeApplication()) {
 
         val formatter = new SimpleDateFormat("yyyy-MM-dd")
@@ -149,22 +149,29 @@ class ApplicationSpec extends Specification with JsonMatchers {
         var dateParam = Some(date)
 
         Task.createUserTaskDate("Tarea1", usuario, dateParam)
+        Task.createUserTaskDate("Tarea2", usuario, dateParam)
 
         val Some(resultTasksUser) = route(FakeRequest(GET, "/" + usuario + "/" + fecha + "/tasks"))
 
         status(resultTasksUser) must equalTo(OK)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
 
-        /*val resultJson: JsValue = contentAsJson(resultTasksUser)
+        val resultJson = contentAsJson(resultTasksUser)
         val resultString = Json.stringify(resultJson) 
 
-        resultString must /("label" -> "Tarea1")
-        resultString must /("usertask" -> usuario)
-        resultString must /("enddate" -> fecha)*/
+        resultJson match{
+          case a: JsArray => a.value.length === 2
+          case _ => throw new Exception("Error")
+        }
+
+        resultString must /#(0) /("label" -> "Tarea1")
+        resultString must /#(0) /("usertask" -> usuario)
+        resultString must /#(0) /("enddate" -> fecha)
+        resultString must /#(1) /("label" -> "Tarea2")
       }      
     }
 
-    "tasksUserBeforeDate" in {  
+    "return OK on GET /<fecha>/before/tasks" in {  
       running(FakeApplication()) {
 
         val formatter = new SimpleDateFormat("yyyy-MM-dd")

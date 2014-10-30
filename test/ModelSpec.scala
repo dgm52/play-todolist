@@ -34,9 +34,8 @@ class ModelSpec extends Specification{
         "create a task and check there is one task" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
-                // Creamos tarea (con el usuario Anonimo implicito)
+                // Creamos tarea (usuario Anonimo implicito)
                 Task.create("Tarea1")
-
                 Task.all() must have size(1)
             }
         }
@@ -47,7 +46,6 @@ class ModelSpec extends Specification{
                 val id = Task.create("Tarea2")
 
                 val Some(tarea) = Task.getTask(id)
-                //val Some(user) = User.findByUsername("pepito@gmail.com")  
                 tarea.label must equalTo("Tarea2")
             }
         }
@@ -106,6 +104,5 @@ class ModelSpec extends Specification{
                 Task.allBeforeDate(dateParam) must have size(0)
             }
         }
-
     }  
 }

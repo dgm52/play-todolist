@@ -117,7 +117,7 @@ object Application extends Controller {
             val json = Json.toJson(Task.allUserDate(i, dateParam))
             Ok(json)
           }  
-          case None => NotFound  
+          case None => NotFound 
       }  
    }
 
