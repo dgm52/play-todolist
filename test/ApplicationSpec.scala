@@ -96,6 +96,17 @@ class ApplicationSpec extends Specification with JsonMatchers {
 
         status(resultTasksUser) must equalTo(OK)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
+
+        val resultJson = contentAsJson(resultTasksUser)
+        val resultString = Json.stringify(resultJson) 
+
+        resultJson match{
+          case a: JsArray => a.value.length === 1
+          case _ => throw new Exception("Error")
+        }
+
+        resultString must /#(0) /("label" -> "Tarea1")
+        resultString must /#(0) /("usertask" -> usuario)
       }      
     }
 
@@ -186,7 +197,18 @@ class ApplicationSpec extends Specification with JsonMatchers {
 
         status(resultTasksUser) must equalTo(OK)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
-        contentAsString(resultTasksUser) must contain ("Tarea1")
+
+        val resultJson = contentAsJson(resultTasksUser)
+        val resultString = Json.stringify(resultJson) 
+
+        resultJson match{
+          case a: JsArray => a.value.length === 1
+          case _ => throw new Exception("Error")
+        }
+
+        resultString must /#(0) /("label" -> "Tarea1")
+        resultString must /#(0) /("usertask" -> usuario)
+        resultString must /#(0) /("enddate" -> fecha)
       }      
     }
   }
