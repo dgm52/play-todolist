@@ -6,6 +6,7 @@ import play.api.test._
 import play.api.test.Helpers._
 
 import models.Task
+import models.User
 
 import java.util.Date
 import java.text.SimpleDateFormat
@@ -54,7 +55,7 @@ class ModelSpec extends Specification{
         "find user" in {  
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
-                val Some(usuario) = Task.getUser("Dani")
+                val Some(usuario) = User.getUser("Dani")
                 usuario must equalTo("Dani")
             }
         }
@@ -62,7 +63,7 @@ class ModelSpec extends Specification{
         "find incorrect user" in {  
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
-                val usuario = Task.getUser("a")
+                val usuario = User.getUser("a")
                 usuario must be (None)
             }
         }

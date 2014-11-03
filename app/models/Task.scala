@@ -48,13 +48,6 @@ object Task {
 
    /* Feature2 */
 
-   def getUser(login: String): Option[String] = DB.withConnection { implicit c =>
-
-      SQL("select login from usertask where login = {login}").on(
-         'login -> login
-      ).as(scalar[String].singleOpt)
-   }
-
    def allUser(login: String): List[Task] = DB.withConnection { implicit c =>
       SQL("select * from task where usertask_fk = {usuario}").on(
          'usuario -> login

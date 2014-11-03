@@ -14,6 +14,7 @@ import java.util.Date
 import java.text.SimpleDateFormat
 
 import models.Task
+import models.User
 
 case class TaskData(label: String, login: String, enddate: Option[Date])
 
@@ -70,7 +71,7 @@ object Application extends Controller {
    /* Feature 2 */
 
    def tasksUser(login: String) = Action {
-      Task.getUser(login) match {  
+      User.getUser(login) match {  
           case Some(i) => {
             val json = Json.toJson(Task.allUser(i))
             Ok(json)
@@ -98,7 +99,7 @@ object Application extends Controller {
 
       taskForm.bindFromRequest.fold(
        errors => BadRequest("Error en la peticion: form"),
-       taskData => Task.getUser(login) match {
+       taskData => User.getUser(login) match {
                      case Some(i) => {
                         val id: Long = Task.createUserTaskDate(taskData.label, login, dateParam)
                         val task = Task.getTask(id)
@@ -112,7 +113,7 @@ object Application extends Controller {
       var date = formatter.parse(enddate)
       var dateParam = dateToOptionDate(date)
 
-      Task.getUser(login) match {  
+      User.getUser(login) match {  
           case Some(i) => {
             val json = Json.toJson(Task.allUserDate(i, dateParam))
             Ok(json)
