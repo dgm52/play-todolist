@@ -5,8 +5,7 @@ import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
 
-import models.Task
-import models.User
+import models._
 
 import java.util.Date
 import java.text.SimpleDateFormat
@@ -105,5 +104,24 @@ class ModelSpec extends Specification{
                 Task.allBeforeDate(dateParam) must have size(0)
             }
         }
-    }  
+
+
+
+        /* TDD TESTS Categories */
+
+        "Devolver el ID al crear una fecha" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                var id = Category.create("Carrera", "Dani")
+                id must beGreaterThan(0.toLong)
+            }
+        }
+
+        "Devolver la lista de categorias" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                Category.create("Carrera", "Dani")
+
+                Category.all() must have size(1)
+            }
+        }
+    }
 }
