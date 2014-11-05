@@ -83,6 +83,8 @@ object Task {
 
    /* !-- Feature 3 */
 
+
+
    /* TDD Categorias */
 
    def createUserTaskDateCategory(label: String, login: String, enddate: Option[Date], category: String): Long = DB.withConnection { implicit c =>

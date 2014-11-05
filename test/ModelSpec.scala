@@ -140,7 +140,9 @@ class ModelSpec extends Specification{
 
         "Devolver el ID al crear una Tarea dentro de una Categoria" in {            
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
-                var id = Category.create("Carrera", "Dani")
+                var date = formatter.parse("2015-01-02")
+                var dateParam = Some(date)
+                var id = Task.createUserTaskDateCategory("Tarea1", "Dani", dateParam, "Inbox")
 
                 id must beGreaterThan(0.toLong)
             }
