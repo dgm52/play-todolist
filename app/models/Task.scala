@@ -8,7 +8,7 @@ import play.api.Play.current
 
 import java.util.{Date}
 
-case class Task(id: Long, label: String, usertask: String, enddate: Option[Date])
+case class Task(id: Long, label: String, usertask: String, enddate: Option[Date], category: String)
 
 object Task {
 
@@ -16,8 +16,9 @@ object Task {
       get[Long]("id") ~
       get[String]("label") ~
       get[String]("usertask_fk") ~ 
-      get[Option[Date]]("enddate") map {
-         case id~label~usertask~enddate => Task(id, label, usertask, enddate)
+      get[Option[Date]]("enddate") ~
+      get[String]("categorytask_fk") map {
+         case id~label~usertask~enddate~category => Task(id, label, usertask, enddate, category)
       }
    }
 
@@ -31,7 +32,7 @@ object Task {
       ).as(task.singleOpt)
    }
 
-   def create(label: String): Long = createUserTask(label, "Anonimo")
+   def create(label: String): Long = createUserTaskDateCategory(label, "Anonimo", None, "Inbox")
 
    def delete(id: Long): Boolean = {
       DB.withConnection { implicit c =>
@@ -55,7 +56,7 @@ object Task {
    }
 
    def createUserTask(label: String, login: String): Long = DB.withConnection { implicit c =>      
-      createUserTaskDate(label, login, None)
+      createUserTaskDateCategory(label, login, None, "Inbox")
    }
 
    /* !-- Feature 2 */
@@ -77,12 +78,21 @@ object Task {
    }
 
    def createUserTaskDate(label: String, login: String, enddate: Option[Date]): Long = DB.withConnection { implicit c =>
+      createUserTaskDateCategory(label, login, enddate, "Inbox")
+   }
+
+   /* !-- Feature 3 */
+
+   /* TDD Categorias */
+
+   def createUserTaskDateCategory(label: String, login: String, enddate: Option[Date], category: String): Long = DB.withConnection { implicit c =>
       var date = Some(enddate)
 
-      val id: Option[Long] = SQL("insert into task (usertask_fk, label, enddate) values ({login}, {label}, {enddate})").on(
+      val id: Option[Long] = SQL("insert into task (usertask_fk, label, enddate, categorytask_fk) values ({login}, {label}, {enddate}, {category})").on(
          'login -> login,
          'label -> label,
-         'enddate -> date
+         'enddate -> date,
+         'category -> category
       ).executeInsert()
 
       val b: Long = id match {  
@@ -92,6 +102,4 @@ object Task {
 
       id.getOrElse(-1)
    }
-
-   /* !-- Feature 3 */
 }

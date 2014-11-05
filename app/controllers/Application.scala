@@ -37,7 +37,8 @@ object Application extends Controller {
       (JsPath \ "id").write[Long] and
       (JsPath \ "label").write[String] and
       (JsPath \ "usertask").write[String] and
-      (JsPath \ "enddate").writeNullable[Date](dateWrite)
+      (JsPath \ "enddate").writeNullable[Date](dateWrite) and
+      (JsPath \ "category").write[String]
    )(unlift(Task.unapply))
 
    /* /For JSON */

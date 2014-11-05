@@ -7,8 +7,13 @@ CREATE TABLE category (
    user varchar(255) REFERENCES usertask(login)
 );
 
+ALTER TABLE task ADD categorytask_fk varchar(255);
+ALTER TABLE task ADD FOREIGN KEY (categorytask_fk) REFERENCES category(name);
+
+insert into category (name, user) values ('Inbox', 'Dani');
  
 # --- !Downs
 
+ALTER TABLE task DROP categorytask_fk;
 DROP TABLE category;
 DROP SEQUENCE category_id_seq;

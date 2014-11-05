@@ -109,18 +109,20 @@ class ModelSpec extends Specification{
 
         /* TDD TESTS Categories */
 
-        "Devolver el ID al crear una fecha" in {
+        "Devolver el ID al crear una categoria" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
                 var id = Category.create("Carrera", "Dani")
+
                 id must beGreaterThan(0.toLong)
             }
         }
 
         "Devolver la lista de categorias" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
                 Category.create("Carrera", "Dani")
 
-                Category.all() must have size(1)
+                Category.all() must have size(2)
             }
         }
 
@@ -132,7 +134,15 @@ class ModelSpec extends Specification{
                 Category.create("Asignaturas", usuario)
                 Category.create("Nada", "Anonimo")
 
-                Category.all4User(usuario) must have size(2)
+                Category.all4User(usuario) must have size(3)
+            }
+        }
+
+        "Devolver el ID al crear una Tarea dentro de una Categoria" in {            
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                var id = Category.create("Carrera", "Dani")
+
+                id must beGreaterThan(0.toLong)
             }
         }
     }
