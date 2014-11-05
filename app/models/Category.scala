@@ -37,4 +37,10 @@ object Category {
    def all(): List[Category] = DB.withConnection { implicit c =>
       SQL("select * from category").as(category *)
    }
+
+   def all4User(user: String): List[Category] = DB.withConnection { implicit c=>
+      SQL("select * from category where user = {user}").on(
+         'user -> user
+      ).as(category *)
+   }
 }

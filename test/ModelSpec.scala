@@ -123,5 +123,17 @@ class ModelSpec extends Specification{
                 Category.all() must have size(1)
             }
         }
+
+        "Devolver la lista de categorias de un Usuario" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val usuario = "Dani"
+
+                Category.create("Carrera", usuario)
+                Category.create("Asignaturas", usuario)
+                Category.create("Nada", "Anonimo")
+
+                Category.all4User(usuario) must have size(2)
+            }
+        }
     }
 }
