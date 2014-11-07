@@ -140,6 +140,17 @@ object Application extends Controller {
 
 
    /* TDD Categories */
-
+   def all4Category4User(user: String, category: String) = Action {
+      User.getUser(user) match {  
+          case Some(i) => {
+            if(Category.exists(category, user)){
+            val json = Json.toJson(Task.all4Category4User(user, category))
+            Ok(json)
+            }
+            else NotFound("NotFound: No existe la categoria " + category + " para el usuario: " + user)
+          }  
+          case None => NotFound  
+      } 
+   }
 
 }

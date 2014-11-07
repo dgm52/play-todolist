@@ -16,12 +16,12 @@ GET      /:login/tasks                             controllers.Application.tasks
 POST     /:login/tasks                             controllers.Application.newTaskUser(login: String)
 
 #TaskDates
-GET      /:dateBefore/before/tasks                 controllers.Application.tasksUserBeforeDate(dateBefore: String)
-GET      /:login/:enddate/tasks                    controllers.Application.tasksUserDate(login: String, enddate: String)
-POST     /:login/:enddate/tasks                    controllers.Application.newtaskUserDate(login: String, enddate: String)
+GET      /tasks/before/:dateBefore                 controllers.Application.tasksUserBeforeDate(dateBefore: String)
+GET      /:login/tasks/:enddate                    controllers.Application.tasksUserDate(login: String, enddate: String)
+POST     /:login/tasks/:enddate                    controllers.Application.newtaskUserDate(login: String, enddate: String)
 
 #TaskCategories
-#GET     /:login/:category/tasks                   controllers.Application.tasksUserCategory(login: String, category: String)
+GET     /:login/:category/tasks                   controllers.Application.all4Category4User(login: String, category: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                              controllers.Assets.at(path="/public", file)
