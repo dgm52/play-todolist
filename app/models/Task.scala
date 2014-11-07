@@ -104,4 +104,11 @@ object Task {
 
       id.getOrElse(-1)
    }
+
+   def all4Category4User(user: String, category: String): List[Task] = DB.withConnection { implicit c =>
+      SQL("select * from task where usertask_fk = {usuario} and categorytask_fk = {category}").on(
+         'usuario -> user,
+         'category -> category
+      ).as(task *)
+   }
 }

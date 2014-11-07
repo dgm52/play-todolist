@@ -122,7 +122,7 @@ class ModelSpec extends Specification{
 
                 Category.create("Universidad", "Dani")
 
-                Category.all() must have size(3)
+                Category.all() must have size(4)
             }
         }
 
@@ -144,6 +144,18 @@ class ModelSpec extends Specification{
                 var id = Task.createUserTaskDateCategory("Tarea1", "Dani", "Carrera", dateParam)
 
                 id must beGreaterThan(0.toLong)
+            }
+        }
+
+        "Devolver la lista de tareas dentro de una categoria de un Usuario" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val usuario = "Dani"
+
+                Task.createUserTaskDateCategory("Tarea 1", usuario, "Carrera", None)
+                Task.createUserTaskDateCategory("Tarea 2", usuario, "Carrera", None)
+                Task.createUserTaskDateCategory("Tarea 3", usuario, "Inbox", None)
+
+                Task.all4Category4User(usuario, "Carrera") must have size(2)
             }
         }
     }
