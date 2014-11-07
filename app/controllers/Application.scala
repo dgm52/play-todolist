@@ -102,11 +102,15 @@ object Application extends Controller {
        errors => BadRequest("Error en la peticion: form"),
        taskData => User.getUser(login) match {
                      case Some(i) => {
-                        val id: Long = Task.createUserTaskDateCategory(taskData.label, login, taskData.category, dateParam)
-                        val task = Task.getTask(id)
-                        Created(Json.toJson(task))
+
+                        if(Category.exists(taskData.category, login)){
+                           val id: Long = Task.createUserTaskDateCategory(taskData.label, login, taskData.category, dateParam)
+                           val task = Task.getTask(id)
+                           Created(Json.toJson(task))
+                        }
+                        else NotFound("NotFound: No existe la categoria " + taskData.category + " para el usuario: " + login)
                      }
-                     case None => BadRequest("Error: No existe el propietario de la tarea: " + taskData.login)
+                     case None => BadRequest("Error: No existe el propietario de la tarea: " + login)
      })   
    }
 
@@ -136,24 +140,6 @@ object Application extends Controller {
 
 
    /* TDD Categories */
-   /*def newtaskUserDateCategory(login: String, enddate: String, category: String) = Action { implicit request =>
-      var dateParam: Option[Date] = None
 
-      if(!enddate.isEmpty()){
-         var date = formatter.parse(enddate)
-         dateParam = dateToOptionDate(date)
-      }
-
-      taskForm.bindFromRequest.fold(
-       errors => BadRequest("Error en la peticion: form"),
-       taskData => User.getUser(login) match {
-                     case Some(i) => {
-                        val id: Long = Task.createUserTaskDateCategory(taskData.label, login, dateParam)
-                        val task = Task.getTask(id)
-                        Created(Json.toJson(task))
-                     }
-                     case None => BadRequest("Error: No existe el propietario de la tarea: " + taskData.login)
-     })   
-   }*/
 
 }

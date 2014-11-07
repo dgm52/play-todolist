@@ -214,30 +214,24 @@ class ApplicationSpec extends Specification with JsonMatchers {
 
 
     /* TDD Categories */
-    /*"return OK on GET /<usuario>/<category>" in {
+
+    "return CREATED on POST /<usuario>/tasks with {Category: Carrera} EncodedBody" in {  
       running(FakeApplication()) {
 
         val usuario = "Dani"
 
-        Task.createUserTaskDateCategory("Tarea1", usuario, "Carrera", None)
+        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario), ("category", "Carrera")))
 
-        val Some(resultTasksUser) = route(FakeRequest(GET, "/Dani/tasks"))
-
-        status(resultTasksUser) must equalTo(OK)
+        status(resultTasksUser) must equalTo(CREATED)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
 
-        val resultJson = contentAsJson(resultTasksUser)
+        val resultJson: JsValue = contentAsJson(resultTasksUser)
         val resultString = Json.stringify(resultJson) 
 
-        resultJson match{
-          case a: JsArray => a.value.length === 1
-          case _ => throw new Exception("Error")
-        }
-
-        resultString must /#(0) /("label" -> "Tarea1")
-        resultString must /#(0) /("usertask" -> usuario)
-        resultString must /#(0) /("category" -> "Carrera")
-      }
-    }*/
+        resultString must /("label" -> "Tarea 2")
+        resultString must /("usertask" -> usuario)
+        resultString must /("category" -> "Carrera")
+      }      
+    }
   }
 }

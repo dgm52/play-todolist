@@ -43,4 +43,9 @@ object Category {
          'user -> user
       ).as(category *)
    }
+
+   def exists(category: String, user: String): Boolean = DB.withConnection { implicit c =>
+      SQL("select count(*) from category where name = {category} and user = {user}").on(
+          'category -> category, 'user -> user).as(scalar[Long].single) == 1
+   }
 }
