@@ -12,6 +12,7 @@ ALTER TABLE task ADD categorytask_fk varchar(255);
 ALTER TABLE task ADD FOREIGN KEY (categorytask_fk) REFERENCES category(name);
 
 insert into category (name, user) values ('Inbox', 'Dani');
+insert into category (name, user) values ('Carrera', 'Dani');
  
 # --- !Downs
 

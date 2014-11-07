@@ -3,22 +3,25 @@
 # ~~~~
 
 # Home page
-GET     /                              controllers.Application.index
+GET      /                                         controllers.Application.index
 
 # Tasks
-GET     /tasks                         controllers.Application.tasks
-GET     /tasks/:id                     controllers.Application.getTask(id: Long)
-POST    /tasks                         controllers.Application.newTask
-DELETE  /tasks/:id                     controllers.Application.deleteTask(id: Long) 
+GET      /tasks                                    controllers.Application.tasks
+GET      /tasks/:id                                controllers.Application.getTask(id: Long)
+POST     /tasks                                    controllers.Application.newTask
+DELETE   /tasks/:id                                controllers.Application.deleteTask(id: Long) 
 
 #UserTasks
-GET     /:login/tasks                  controllers.Application.tasksUser(login: String)
-POST    /:login/tasks                  controllers.Application.newTaskUser(login: String)
+GET      /:login/tasks                             controllers.Application.tasksUser(login: String)
+POST     /:login/tasks                             controllers.Application.newTaskUser(login: String)
 
 #TaskDates
-GET     /:dateBefore/before/tasks      controllers.Application.tasksUserBeforeDate(dateBefore: String)
-GET     /:login/:enddate/tasks         controllers.Application.tasksUserDate(login: String, enddate: String)
-POST    /:login/:enddate/tasks         controllers.Application.newtaskUserDate(login: String, enddate: String)
+GET      /:dateBefore/before/tasks                 controllers.Application.tasksUserBeforeDate(dateBefore: String)
+GET      /:login/:enddate/tasks                    controllers.Application.tasksUserDate(login: String, enddate: String)
+POST     /:login/:enddate/tasks                    controllers.Application.newtaskUserDate(login: String, enddate: String)
+
+#TaskCategories
+#GET     /:login/:category/tasks                   controllers.Application.tasksUserCategory(login: String, category: String)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                  controllers.Assets.at(path="/public", file)
+GET     /assets/*file                              controllers.Assets.at(path="/public", file)

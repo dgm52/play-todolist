@@ -111,7 +111,7 @@ class ModelSpec extends Specification{
 
         "Devolver el ID al crear una categoria" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
-                var id = Category.create("Carrera", "Dani")
+                var id = Category.create("Universidad", "Dani")
 
                 id must beGreaterThan(0.toLong)
             }
@@ -120,9 +120,9 @@ class ModelSpec extends Specification{
         "Devolver la lista de categorias" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
-                Category.create("Carrera", "Dani")
+                Category.create("Universidad", "Dani")
 
-                Category.all() must have size(2)
+                Category.all() must have size(3)
             }
         }
 
@@ -130,7 +130,6 @@ class ModelSpec extends Specification{
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
                 val usuario = "Dani"
 
-                Category.create("Carrera", usuario)
                 Category.create("Asignaturas", usuario)
                 Category.create("Nada", "Anonimo")
 
@@ -142,7 +141,7 @@ class ModelSpec extends Specification{
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
                 var date = formatter.parse("2015-01-02")
                 var dateParam = Some(date)
-                var id = Task.createUserTaskDateCategory("Tarea1", "Dani", dateParam, "Inbox")
+                var id = Task.createUserTaskDateCategory("Tarea1", "Dani", "Carrera", dateParam)
 
                 id must beGreaterThan(0.toLong)
             }

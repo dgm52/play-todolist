@@ -32,7 +32,7 @@ object Task {
       ).as(task.singleOpt)
    }
 
-   def create(label: String): Long = createUserTaskDateCategory(label, "Anonimo", None, "Inbox")
+   def create(label: String): Long = createUserTaskDateCategory(label, "Anonimo", "Inbox", None)
 
    def delete(id: Long): Boolean = {
       DB.withConnection { implicit c =>
@@ -56,7 +56,7 @@ object Task {
    }
 
    def createUserTask(label: String, login: String): Long = DB.withConnection { implicit c =>      
-      createUserTaskDateCategory(label, login, None, "Inbox")
+      createUserTaskDateCategory(label, login, "Inbox", None)
    }
 
    /* !-- Feature 2 */
@@ -78,7 +78,7 @@ object Task {
    }
 
    def createUserTaskDate(label: String, login: String, enddate: Option[Date]): Long = DB.withConnection { implicit c =>
-      createUserTaskDateCategory(label, login, enddate, "Inbox")
+      createUserTaskDateCategory(label, login, "Inbox", enddate)
    }
 
    /* !-- Feature 3 */
@@ -87,7 +87,7 @@ object Task {
 
    /* TDD Categorias */
 
-   def createUserTaskDateCategory(label: String, login: String, enddate: Option[Date], category: String): Long = DB.withConnection { implicit c =>
+   def createUserTaskDateCategory(label: String, login: String, category: String, enddate: Option[Date]): Long = DB.withConnection { implicit c =>
       var date = Some(enddate)
 
       val id: Option[Long] = SQL("insert into task (usertask_fk, label, enddate, categorytask_fk) values ({login}, {label}, {enddate}, {category})").on(
@@ -97,7 +97,7 @@ object Task {
          'category -> category
       ).executeInsert()
 
-      val b: Long = id match {  
+      val b: Long = id match {
           case Some(id) => id
           case None => 0  
       }      

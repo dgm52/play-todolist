@@ -13,10 +13,9 @@ import java.util.{Date}
 import java.util.Date
 import java.text.SimpleDateFormat
 
-import models.Task
-import models.User
+import models._
 
-case class TaskData(label: String, login: String, enddate: Option[Date])
+case class TaskData(label: String, login: String, enddate: Option[Date], category: String)
 
 object Application extends Controller {
 
@@ -27,7 +26,8 @@ object Application extends Controller {
       mapping( 
          "label" -> nonEmptyText,
          "login" -> nonEmptyText,
-         "enddate" -> optional(date("yyyy-MM-dd"))
+         "enddate" -> optional(date("yyyy-MM-dd")),
+         "category" -> nonEmptyText
       )(TaskData.apply)(TaskData.unapply)
    )
 
@@ -102,7 +102,7 @@ object Application extends Controller {
        errors => BadRequest("Error en la peticion: form"),
        taskData => User.getUser(login) match {
                      case Some(i) => {
-                        val id: Long = Task.createUserTaskDate(taskData.label, login, dateParam)
+                        val id: Long = Task.createUserTaskDateCategory(taskData.label, login, taskData.category, dateParam)
                         val task = Task.getTask(id)
                         Created(Json.toJson(task))
                      }
@@ -132,4 +132,28 @@ object Application extends Controller {
    }
 
    /* !-- Feature 3 */
+
+
+
+   /* TDD Categories */
+   /*def newtaskUserDateCategory(login: String, enddate: String, category: String) = Action { implicit request =>
+      var dateParam: Option[Date] = None
+
+      if(!enddate.isEmpty()){
+         var date = formatter.parse(enddate)
+         dateParam = dateToOptionDate(date)
+      }
+
+      taskForm.bindFromRequest.fold(
+       errors => BadRequest("Error en la peticion: form"),
+       taskData => User.getUser(login) match {
+                     case Some(i) => {
+                        val id: Long = Task.createUserTaskDateCategory(taskData.label, login, dateParam)
+                        val task = Task.getTask(id)
+                        Created(Json.toJson(task))
+                     }
+                     case None => BadRequest("Error: No existe el propietario de la tarea: " + taskData.login)
+     })   
+   }*/
+
 }

@@ -37,7 +37,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
       running(FakeApplication()) {
 
         val Some(result) = route(  
-          FakeRequest(POST, "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login","Anonimo"))
+          FakeRequest(POST, "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login","Anonimo"), ("category", "Inbox"))
           )
 
         status(result) must equalTo(CREATED)
@@ -115,7 +115,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
 
         val usuario = "Dani"
 
-        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario)))
+        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario), ("category", "Inbox")))
 
         status(resultTasksUser) must equalTo(CREATED)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
@@ -136,7 +136,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
         val usuario = "Dani"
         val fecha = "2015-01-02"
 
-        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/" + fecha + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario), ("enddate",fecha)))
+        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/" + fecha + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario), ("enddate",fecha), ("category", "Inbox")))
 
         status(resultTasksUser) must equalTo(CREATED)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
@@ -209,7 +209,35 @@ class ApplicationSpec extends Specification with JsonMatchers {
         resultString must /#(0) /("label" -> "Tarea1")
         resultString must /#(0) /("usertask" -> usuario)
         resultString must /#(0) /("enddate" -> fecha)
-      }      
+      }  
     }
+
+
+    /* TDD Categories */
+    /*"return OK on GET /<usuario>/<category>" in {
+      running(FakeApplication()) {
+
+        val usuario = "Dani"
+
+        Task.createUserTaskDateCategory("Tarea1", usuario, "Carrera", None)
+
+        val Some(resultTasksUser) = route(FakeRequest(GET, "/Dani/tasks"))
+
+        status(resultTasksUser) must equalTo(OK)
+        contentType(resultTasksUser) must beSome.which(_ == "application/json")
+
+        val resultJson = contentAsJson(resultTasksUser)
+        val resultString = Json.stringify(resultJson) 
+
+        resultJson match{
+          case a: JsArray => a.value.length === 1
+          case _ => throw new Exception("Error")
+        }
+
+        resultString must /#(0) /("label" -> "Tarea1")
+        resultString must /#(0) /("usertask" -> usuario)
+        resultString must /#(0) /("category" -> "Carrera")
+      }
+    }*/
   }
 }
