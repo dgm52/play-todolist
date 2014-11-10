@@ -259,5 +259,26 @@ class ApplicationSpec extends Specification with JsonMatchers {
         resultString must /#(0) /("category" -> category)
       }
     }
+
+    "return MODIFY on PUT /tasks/<:id>" in {
+      running(FakeApplication()) {
+        val usuario = "Dani"
+        val category = "Inbox"
+
+        val id = Task.createUserTaskDateCategory("Tarea1", usuario, "Carrera", None)
+
+        val Some(result) = route(FakeRequest(PUT, "/tasks/" + id + "/" + category))
+
+        status(result) must equalTo(OK)
+        contentType(result) must beSome.which(_ == "application/json")
+
+        val resultJson = contentAsJson(result)
+        val resultString = Json.stringify(resultJson)
+
+        resultString must /("label" -> "Tarea1")
+        resultString must /("usertask" -> usuario)
+        resultString must /("category" -> category)
+      }
+    }
   }
 }

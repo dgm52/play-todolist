@@ -158,5 +158,19 @@ class ModelSpec extends Specification{
                 Task.all4Category4User(usuario, "Carrera") must have size(2)
             }
         }
+
+        //TODO: Modificar tareas -> (modificar categoria asignada)
+        //TODO: Posibilidad de que una tarea tenga mas de una categoria asignada
+
+        "Devolver true al modificarse la categoria de una tarea" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                Task.createUserTaskDateCategory("Tarea 1", "Dani", "Carrera", None)
+
+                Task.modifyCategory(1, "Inbox") must equalTo(true)
+
+                val Some(tarea) = Task.getTask(1)
+                tarea.category must equalTo("Inbox")
+            }
+        }
     }
 }

@@ -111,4 +111,16 @@ object Task {
          'category -> category
       ).as(task *)
    }
+
+   def modifyCategory(id: Long, category: String): Boolean = DB.withConnection { implicit c =>
+      val result: Int = SQL("update task set categorytask_fk = {category} where id = {id}").on(
+        'category -> category,
+        'id -> id
+      ).executeUpdate()
+
+      result match {
+         case 1 => true
+         case _ => false
+       }
+   }
 }

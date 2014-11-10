@@ -53,8 +53,13 @@ object Application extends Controller {
    }
 
    def getTask(id: Long) = Action {
-      val json = Json.toJson(Task.getTask(id))
-      Ok(json)
+      Task.getTask(id) match {  
+         case Some(i) => {
+            val json = Json.toJson(Task.getTask(id))
+            Ok(json)
+         }  
+         case None => NotFound
+      }
    }
 
    def newTask = newTaskUser("Anonimo")
@@ -144,12 +149,28 @@ object Application extends Controller {
       User.getUser(user) match {  
           case Some(i) => {
             if(Category.exists(category, user)){
-            val json = Json.toJson(Task.all4Category4User(user, category))
-            Ok(json)
+               val json = Json.toJson(Task.all4Category4User(user, category))
+               Ok(json)
             }
             else NotFound("NotFound: No existe la categoria " + category + " para el usuario: " + user)
           }  
           case None => NotFound  
+      } 
+   }
+
+   def modifyCategoryOfTask(id: Long, category: String) = Action {
+
+      Task.getTask(id) match {  
+         case Some(i) => {
+            val correct = Task.modifyCategory(id, category)
+
+            if(correct){
+               val json = Json.toJson(Task.getTask(id))
+               Ok(json)
+            }
+            else NotFound("No se ha podido modificar la tarea")
+         }  
+            case None => NotFound("Tarea " + id + " no encontrada")
       } 
    }
 
