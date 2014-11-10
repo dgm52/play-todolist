@@ -13,10 +13,9 @@ import java.util.{Date}
 import java.util.Date
 import java.text.SimpleDateFormat
 
-import models.Task
-import models.User
+import models._
 
-case class TaskData(label: String, login: String, enddate: Option[Date])
+case class TaskData(label: String, login: String, enddate: Option[Date], category: String)
 
 object Application extends Controller {
 
@@ -27,7 +26,8 @@ object Application extends Controller {
       mapping( 
          "label" -> nonEmptyText,
          "login" -> nonEmptyText,
-         "enddate" -> optional(date("yyyy-MM-dd"))
+         "enddate" -> optional(date("yyyy-MM-dd")),
+         "category" -> nonEmptyText
       )(TaskData.apply)(TaskData.unapply)
    )
 
@@ -37,7 +37,8 @@ object Application extends Controller {
       (JsPath \ "id").write[Long] and
       (JsPath \ "label").write[String] and
       (JsPath \ "usertask").write[String] and
-      (JsPath \ "enddate").writeNullable[Date](dateWrite)
+      (JsPath \ "enddate").writeNullable[Date](dateWrite) and
+      (JsPath \ "category").write[String]
    )(unlift(Task.unapply))
 
    /* /For JSON */
@@ -52,8 +53,13 @@ object Application extends Controller {
    }
 
    def getTask(id: Long) = Action {
-      val json = Json.toJson(Task.getTask(id))
-      Ok(json)
+      Task.getTask(id) match {  
+         case Some(i) => {
+            val json = Json.toJson(Task.getTask(id))
+            Ok(json)
+         }  
+         case None => NotFound
+      }
    }
 
    def newTask = newTaskUser("Anonimo")
@@ -101,11 +107,15 @@ object Application extends Controller {
        errors => BadRequest("Error en la peticion: form"),
        taskData => User.getUser(login) match {
                      case Some(i) => {
-                        val id: Long = Task.createUserTaskDate(taskData.label, login, dateParam)
-                        val task = Task.getTask(id)
-                        Created(Json.toJson(task))
+
+                        if(Category.exists(taskData.category, login)){
+                           val id: Long = Task.createUserTaskDateCategory(taskData.label, login, taskData.category, dateParam)
+                           val task = Task.getTask(id)
+                           Created(Json.toJson(task))
+                        }
+                        else NotFound("NotFound: No existe la categoria " + taskData.category + " para el usuario: " + login)
                      }
-                     case None => BadRequest("Error: No existe el propietario de la tarea: " + taskData.login)
+                     case None => BadRequest("Error: No existe el propietario de la tarea: " + login)
      })   
    }
 
@@ -131,4 +141,37 @@ object Application extends Controller {
    }
 
    /* !-- Feature 3 */
+
+
+
+   /* TDD Categories */
+   def all4Category4User(user: String, category: String) = Action {
+      User.getUser(user) match {  
+          case Some(i) => {
+            if(Category.exists(category, user)){
+               val json = Json.toJson(Task.all4Category4User(user, category))
+               Ok(json)
+            }
+            else NotFound("NotFound: No existe la categoria " + category + " para el usuario: " + user)
+          }  
+          case None => NotFound  
+      } 
+   }
+
+   def modifyCategoryOfTask(id: Long, category: String) = Action {
+
+      Task.getTask(id) match {  
+         case Some(i) => {
+            val correct = Task.modifyCategory(id, category)
+
+            if(correct){
+               val json = Json.toJson(Task.getTask(id))
+               Ok(json)
+            }
+            else NotFound("No se ha podido modificar la tarea")
+         }  
+            case None => NotFound("Tarea " + id + " no encontrada")
+      } 
+   }
+
 }

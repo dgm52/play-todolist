@@ -37,7 +37,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
       running(FakeApplication()) {
 
         val Some(result) = route(  
-          FakeRequest(POST, "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login","Anonimo"))
+          FakeRequest(POST, "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login","Anonimo"), ("category", "Inbox"))
           )
 
         status(result) must equalTo(CREATED)
@@ -115,7 +115,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
 
         val usuario = "Dani"
 
-        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario)))
+        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario), ("category", "Inbox")))
 
         status(resultTasksUser) must equalTo(CREATED)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
@@ -130,13 +130,13 @@ class ApplicationSpec extends Specification with JsonMatchers {
 
     //Feature 3
 
-    "return CREATED on POST /<usuario>/<fecha>/tasks with EncodedBody" in {  
+    "return CREATED on POST /<usuario>/tasks/<fecha> with EncodedBody" in {  
       running(FakeApplication()) {
 
         val usuario = "Dani"
         val fecha = "2015-01-02"
 
-        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/" + fecha + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario), ("enddate",fecha)))
+        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/tasks/" + fecha).withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario), ("enddate",fecha), ("category", "Inbox")))
 
         status(resultTasksUser) must equalTo(CREATED)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
@@ -150,7 +150,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
       }      
     }
 
-    "return OK on GET /<usuario>/<fecha>/tasks" in {  
+    "return OK on GET /<usuario>/tasks/<fecha>" in {  
       running(FakeApplication()) {
 
         val formatter = new SimpleDateFormat("yyyy-MM-dd")
@@ -162,7 +162,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
         Task.createUserTaskDate("Tarea1", usuario, dateParam)
         Task.createUserTaskDate("Tarea2", usuario, dateParam)
 
-        val Some(resultTasksUser) = route(FakeRequest(GET, "/" + usuario + "/" + fecha + "/tasks"))
+        val Some(resultTasksUser) = route(FakeRequest(GET, "/" + usuario + "/tasks/" + fecha))
 
         status(resultTasksUser) must equalTo(OK)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
@@ -182,7 +182,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
       }      
     }
 
-    "return OK on GET /<fecha>/before/tasks" in {  
+    "return OK on GET /tasks/before/<fecha>" in {  
       running(FakeApplication()) {
 
         val formatter = new SimpleDateFormat("yyyy-MM-dd")
@@ -193,7 +193,7 @@ class ApplicationSpec extends Specification with JsonMatchers {
 
         Task.createUserTaskDate("Tarea1", usuario, dateParam)
 
-        val Some(resultTasksUser) = route(FakeRequest(GET, "/2015-01-03" + "/before/tasks"))
+        val Some(resultTasksUser) = route(FakeRequest(GET, "/tasks/before/" + "2015-01-03"))
 
         status(resultTasksUser) must equalTo(OK)
         contentType(resultTasksUser) must beSome.which(_ == "application/json")
@@ -209,7 +209,76 @@ class ApplicationSpec extends Specification with JsonMatchers {
         resultString must /#(0) /("label" -> "Tarea1")
         resultString must /#(0) /("usertask" -> usuario)
         resultString must /#(0) /("enddate" -> fecha)
+      }  
+    }
+
+
+    /* TDD Categories */
+
+    "return CREATED on POST /<usuario>/tasks with {Category: Carrera} EncodedBody" in {  
+      running(FakeApplication()) {
+
+        val usuario = "Dani"
+
+        val Some(resultTasksUser) = route(FakeRequest(POST, "/" + usuario + "/tasks").withFormUrlEncodedBody(("label","Tarea 2"), ("login",usuario), ("category", "Carrera")))
+
+        status(resultTasksUser) must equalTo(CREATED)
+        contentType(resultTasksUser) must beSome.which(_ == "application/json")
+
+        val resultJson: JsValue = contentAsJson(resultTasksUser)
+        val resultString = Json.stringify(resultJson) 
+
+        resultString must /("label" -> "Tarea 2")
+        resultString must /("usertask" -> usuario)
+        resultString must /("category" -> "Carrera")
       }      
+    }
+
+    "return OK on GET /<usuario>/<category>/tasks" in {
+      running(FakeApplication()) {
+        val usuario = "Dani"
+        val category = "Carrera"
+
+        Task.createUserTaskDateCategory("Tarea1", usuario, category, None)
+
+        val Some(result) = route(FakeRequest(GET, "/" + usuario + "/" + category + "/tasks"))
+
+        status(result) must equalTo(OK)
+        contentType(result) must beSome.which(_ == "application/json")
+
+        val resultJson = contentAsJson(result)
+        val resultString = Json.stringify(resultJson) 
+
+        resultJson match{
+          case a: JsArray => a.value.length === 1
+          case _ => throw new Exception("Error")
+        }
+
+        resultString must /#(0) /("label" -> "Tarea1")
+        resultString must /#(0) /("usertask" -> usuario)
+        resultString must /#(0) /("category" -> category)
+      }
+    }
+
+    "return MODIFY on PUT /tasks/<:id>" in {
+      running(FakeApplication()) {
+        val usuario = "Dani"
+        val category = "Inbox"
+
+        val id = Task.createUserTaskDateCategory("Tarea1", usuario, "Carrera", None)
+
+        val Some(result) = route(FakeRequest(PUT, "/tasks/" + id + "/" + category))
+
+        status(result) must equalTo(OK)
+        contentType(result) must beSome.which(_ == "application/json")
+
+        val resultJson = contentAsJson(result)
+        val resultString = Json.stringify(resultJson)
+
+        resultString must /("label" -> "Tarea1")
+        resultString must /("usertask" -> usuario)
+        resultString must /("category" -> category)
+      }
     }
   }
 }

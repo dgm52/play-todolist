@@ -5,8 +5,7 @@ import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
 
-import models.Task
-import models.User
+import models._
 
 import java.util.Date
 import java.text.SimpleDateFormat
@@ -105,5 +104,73 @@ class ModelSpec extends Specification{
                 Task.allBeforeDate(dateParam) must have size(0)
             }
         }
-    }  
+
+
+
+        /* TDD TESTS Categories */
+
+        "Devolver el ID al crear una categoria" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                var id = Category.create("Universidad", "Dani")
+
+                id must beGreaterThan(0.toLong)
+            }
+        }
+
+        "Devolver la lista de categorias" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+                Category.create("Universidad", "Dani")
+
+                Category.all() must have size(4)
+            }
+        }
+
+        "Devolver la lista de categorias de un Usuario" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val usuario = "Dani"
+
+                Category.create("Asignaturas", usuario)
+                Category.create("Nada", "Anonimo")
+
+                Category.all4User(usuario) must have size(3)
+            }
+        }
+
+        "Devolver el ID al crear una Tarea dentro de una Categoria" in {            
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                var date = formatter.parse("2015-01-02")
+                var dateParam = Some(date)
+                var id = Task.createUserTaskDateCategory("Tarea1", "Dani", "Carrera", dateParam)
+
+                id must beGreaterThan(0.toLong)
+            }
+        }
+
+        "Devolver la lista de tareas dentro de una categoria de un Usuario" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val usuario = "Dani"
+
+                Task.createUserTaskDateCategory("Tarea 1", usuario, "Carrera", None)
+                Task.createUserTaskDateCategory("Tarea 2", usuario, "Carrera", None)
+                Task.createUserTaskDateCategory("Tarea 3", usuario, "Inbox", None)
+
+                Task.all4Category4User(usuario, "Carrera") must have size(2)
+            }
+        }
+
+        //TODO: Modificar tareas -> (modificar categoria asignada)
+        //TODO: Posibilidad de que una tarea tenga mas de una categoria asignada
+
+        "Devolver true al modificarse la categoria de una tarea" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                Task.createUserTaskDateCategory("Tarea 1", "Dani", "Carrera", None)
+
+                Task.modifyCategory(1, "Inbox") must equalTo(true)
+
+                val Some(tarea) = Task.getTask(1)
+                tarea.category must equalTo("Inbox")
+            }
+        }
+    }
 }
